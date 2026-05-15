@@ -1,52 +1,57 @@
-import React, { useState, useEffect } from "react";
-import Header from "./Header";
-import ToyForm from "./ToyForm";
-import ToyContainer from "./ToyContainer";
+import React, {useState, useMemo } from 'react'
+import ProductList from './components/ProductList'
+import CssBaseline from '@mui/material/CssBaseline'
+import DarkModeToggle from './components/DarkModeToggle'
+import Cart from './components/Cart'
+import { createTheme } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/material/styles'
+const App = () => {
+  //this is for Dark Mode state
+  const [mode, setMode] = useState("light");
+  const theme = useMemo (() => 
+    createTheme({
+      palette:{mode}
+    }), [mode]);
+ const toggleMode = () => {setMode((prev) => (prev === "light" ? "dark" : "light" ));
+  };
+   
+const[cartItems, setCartItems] = useState([]);
+const addToCart = (product) => {
+  setCartItems((prevItems)=> [...prevItems, product]);
+};
+const[category, setCategory] = useState("all");
 
-function App() {
-  const [showForm, setShowForm] = useState(false);
-  const [toys, setToys] = useState([]);
 
-  useEffect(() => {
-    fetch("http://localhost:3001/toys")
-      .then((r) => r.json())
-      .then((data) => setToys(data));
-  }, []);
 
-  function handleToggleForm() {
-    setShowForm((showForm) => !showForm);
-  }
+  // TODO: Implement state for dark mode toggl
 
-  function handleAddToy(newToy) {
-    setToys([...toys, newToy]);
-  }
+  // TODO: Implement state for cart management
 
-  function handleDeleteToy(id) {
-    const updatedToys = toys.filter((toy) => toy.id !== id);
-    setToys(updatedToys);
-  }
-
-  function handleUpdateToy(updatedToy) {
-    const updatedToys = toys.map((toy) =>
-      toy.id === updatedToy.id ? updatedToy : toy
-    );
-    setToys(updatedToys);
-  }
+  // TODO: Implement state for category filtering
 
   return (
-    <>
-      <Header />
-      {showForm ? <ToyForm onAddToy={handleAddToy} /> : null}
-      <div className="buttonContainer">
-        <button onClick={handleToggleForm}>Add a Toy</button>
-      </div>
-      <ToyContainer 
-        toys={toys} 
-        onDeleteToy={handleDeleteToy} 
-        onUpdateToy={handleUpdateToy} 
-      />
-    </>
-  );
+    <div>
+      <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <DarkModeToggle mode={mode} toggleMode={toggleMode} />
+      
+      <h1>🛒 Shopping App</h1>
+      <p>
+        Welcome! to our grocery.
+      </p>
+      {/* TODO: Implement category filter dropdown */}
+      <label>Filter by Category: </label>
+      <select value={category} onChange ={(e) => setCategory(e.target.value)}>
+        <option value="all">All</option>
+        <option value="Fruits">Fruits</option>
+        <option value="Dairy">Dairy</option>
+      </select>
+      <ProductList selectedCategory={category} addToCart={addToCart}/>
+      <Cart cartItems={cartItems}/>
+      </ThemeProvider>
+      {/* TODO: Implement and render Cart component */}
+    </div>
+  )
 }
 
-export default App;
+export default App
